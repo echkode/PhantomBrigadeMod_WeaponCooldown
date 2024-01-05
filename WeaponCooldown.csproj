@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{53EF1860-E193-4C79-BDEF-9FCC8AFC6542}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EchKode.PBMods.WeaponCooldown</RootNamespace>
+    <AssemblyName>WeaponCooldown</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SteamInstallationPath>C:\Program Files (x86)\Steam\steamapps\common\Phantom Brigade</SteamInstallationPath>
+    <EpicInstallationPath>C:\Program Files\Epic Games\PhantomBrigade</EpicInstallationPath>
+    <GameInstallationPath>$(SteamInstallationPath)</GameInstallationPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(GameInstallationPath)\PhantomBrigade_Data\Managed\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(GameInstallationPath)\PhantomBrigade_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(GameInstallationPath)\PhantomBrigade_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Entitas, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(GameInstallationPath)\PhantomBrigade_Data\Managed\Entitas.dll</HintPath>
+    </Reference>
+    <Reference Include="QFSW.QC, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(GameInstallationPath)\PhantomBrigade_Data\Managed\QFSW.QC.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="UnityEngine">
+      <HintPath>$(GameInstallationPath)\PhantomBrigade_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GameInstallationPath)\PhantomBrigade_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityUtilities, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(GameInstallationPath)\PhantomBrigade_Data\Managed\UnityUtilities.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActionUtility.cs" />
+    <Compile Include="AIUtility.cs" />
+    <Compile Include="BTCondition_CheckWeaponReady.cs" />
+    <Compile Include="CIViewCombatTimeline\AdjustTimelineRegions.cs" />
+    <Compile Include="CIViewCombatTimeline\ConfigureActionBackground.cs" />
+    <Compile Include="CIViewCombatTimeline\RefreshTimelineRegions.cs" />
+    <Compile Include="CombatAIBehaviorInvokeSystem.cs" />
+    <Compile Include="CombatAIBindingSystem.cs" />
+    <Compile Include="CombatExecutionEndLateSystem.cs" />
+    <Compile Include="CombatUIUtility.cs" />
+    <Compile Include="ConsoleCommands\DiagnosticCommands.cs" />
+    <Compile Include="ConsoleCommands\LoggingCommands.cs" />
+    <Compile Include="ConsoleCommands\Attributes.cs" />
+    <Compile Include="ConsoleCommands\Registration.cs" />
+    <Compile Include="DataHelperAction.cs" />
+    <Compile Include="DataHelperStats.cs" />
+    <Compile Include="ExtendedPlannedEquipmentUseRecord.cs" />
+    <Compile Include="LoggingToggles.cs" />
+    <Compile Include="Patches\BTAction_UseEquipment.cs" />
+    <Compile Include="Patches\CombatAIBehaviorInvokeSystem.cs" />
+    <Compile Include="Patches\CombatAIBindingSystem.cs" />
+    <Compile Include="Patches\InputCombatWaitDrawingUtility.cs" />
+    <Compile Include="ModLink.cs" />
+    <Compile Include="Patch.cs" />
+    <Compile Include="Patches\ActionUtility.cs" />
+    <Compile Include="Patches\CIViewCombatTimeline.cs" />
+    <Compile Include="Patches\CombatExecutionEndLateSystem.cs" />
+    <Compile Include="Patches\CombatUILinkInWorldScrubbing.cs" />
+    <Compile Include="Patches\CombatUILinkTimeline.cs" />
+    <Compile Include="Patches\CombatUIUtility.cs" />
+    <Compile Include="Patches\CombatUtilities.cs" />
+    <Compile Include="Patches\DataHelperAction.cs" />
+    <Compile Include="Patches\EquipmentUtility.cs" />
+    <Compile Include="Patches\InputCombatDashUtility.cs" />
+    <Compile Include="Patches\InputCombatMeleeUtility.cs" />
+    <Compile Include="Patches\InputUILinkPathPainting.cs" />
+    <Compile Include="Patches\InputUILinkWaitPainting.cs" />
+    <Compile Include="Patches\PathUtility.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Patches\UILinkPaintingPatch.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
