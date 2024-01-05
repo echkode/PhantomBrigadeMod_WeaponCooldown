@@ -1,4 +1,7 @@
-﻿using Content.Code.Utility;
+﻿// Copyright (c) 2024 EchKode
+// SPDX-License-Identifier: BSD-3-Clause
+
+using Content.Code.Utility;
 
 using PhantomBrigade;
 using PhantomBrigade.AI.Components;

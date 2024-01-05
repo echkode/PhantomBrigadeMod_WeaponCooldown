@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2024 EchKode
+// SPDX-License-Identifier: BSD-3-Clause
+
+using System;
 
 using HarmonyLib;
 using PBModManager = PhantomBrigade.Mods.ModManager;

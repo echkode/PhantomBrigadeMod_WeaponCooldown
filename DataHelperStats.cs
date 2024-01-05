@@ -1,4 +1,7 @@
-﻿using PhantomBrigade;
+﻿// Copyright (c) 2024 EchKode
+// SPDX-License-Identifier: BSD-3-Clause
+
+using PhantomBrigade;
 using PhantomBrigade.Data;
 using PBDataHelperStats = PhantomBrigade.Data.DataHelperStats;
 

@@ -1,4 +1,7 @@
-﻿namespace EchKode.PBMods.WeaponCooldown
+﻿// Copyright (c) 2024 EchKode
+// SPDX-License-Identifier: BSD-3-Clause
+
+namespace EchKode.PBMods.WeaponCooldown
 {
 	public static class CombatExecutionEndLateSystem
 	{

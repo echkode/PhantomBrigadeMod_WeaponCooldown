@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿// Copyright (c) 2024 EchKode
+// SPDX-License-Identifier: BSD-3-Clause
+
+using System.Reflection;
 
 using HarmonyLib;
 
