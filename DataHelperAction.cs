@@ -8,6 +8,8 @@ using PhantomBrigade.Data;
 using PBDataHelperAction = PhantomBrigade.Data.DataHelperAction;
 using PBDataHelperStats = PhantomBrigade.Data.DataHelperStats;
 
+using UnityEngine;
+
 namespace EchKode.PBMods.WeaponCooldown
 {
 	public static class DataHelperAction
@@ -20,6 +22,16 @@ namespace EchKode.PBMods.WeaponCooldown
 			var unit = IDUtility.GetLinkedPersistentEntity(combatEntity);
 			if (!PBDataHelperAction.IsAvailable(actionData, unit))
 			{
+				if (LoggingToggles.AIBehaviorInvoke)
+				{
+					Debug.LogFormat(
+						"Mod {0} ({1}) IsAvailableAtTime(): action is not available at time | time: {2:F3}s | unit: {3} | action: {4}",
+						ModLink.modIndex,
+						ModLink.modID,
+						startTime,
+						unit != null ? "P-" + unit.id.id : "C-" + combatEntity.id.id,
+						actionData.key);
+				}
 				return false;
 			}
 
@@ -36,6 +48,16 @@ namespace EchKode.PBMods.WeaponCooldown
 			if (!partOK && !hasDependentAction)
 			{
 				// !!! Assumes that this function is called for equipment use actions.
+				if (LoggingToggles.AIBehaviorInvoke)
+				{
+					Debug.LogFormat(
+						"Mod {0} ({1}) IsAvailableAtTime(): part is not OK | time: {2:F3}s | unit: {3} | action: {4}",
+						ModLink.modIndex,
+						ModLink.modID,
+						startTime,
+						unit != null ? "P-" + unit.id.id : "C-" + combatEntity.id.id,
+						actionData.key);
+				}
 				return false;
 			}
 			else if (hasDependentAction)
@@ -43,10 +65,28 @@ namespace EchKode.PBMods.WeaponCooldown
 				var dependentActionData = DataMultiLinkerAction.GetEntry(dependentData.key, false);
 				if (dependentActionData == null)
 				{
+					Debug.LogWarningFormat(
+						"Mod {0} ({1}) IsAvailableAtTime(): dependent data key should exist | time: {2:F3}s | action: {3} | dependent data key: {4}",
+						ModLink.modIndex,
+						ModLink.modID,
+						startTime,
+						actionData.key,
+						dependentData.key);
 					return false;
 				}
 				if (!PBDataHelperAction.IsAvailable(dependentActionData, unit))
 				{
+					if (LoggingToggles.AIBehaviorInvoke)
+					{
+						Debug.LogFormat(
+							"Mod {0} ({1}) IsAvailableAtTime(): dependent action is not available at time | time: {2:F3}s | unit: {3} | action: {4} | dependent action: {5}",
+							ModLink.modIndex,
+							ModLink.modID,
+							startTime,
+							unit != null ? "P-" + unit.id.id : "C-" + combatEntity.id.id,
+							actionData.key,
+							dependentActionData.key);
+					}
 					return false;
 				}
 			}
@@ -101,6 +141,22 @@ namespace EchKode.PBMods.WeaponCooldown
 				if (actionEndTime < startTime)
 				{
 					continue;
+				}
+
+				if (LoggingToggles.AIBehaviorInvoke)
+				{
+					Debug.LogFormat(
+						"Mod {0} ({1}) IsAvailableAtTime(): action is not available at time due to overlap with existing action | time: {2:F3}s | unit: {3} | action: {4} | existing action: {5}\n  action | start time: {6:F3}s | end time: {7:F3}s\n  existing | start time: {8:F3}s | end time: {9:F3}s",
+						ModLink.modIndex,
+						ModLink.modID,
+						startTime,
+						unit != null ? "P-" + unit.id.id : "C-" + combatEntity.id.id,
+						actionData.key,
+						action.dataKeyAction.s,
+						startTime,
+						endTime,
+						actionStartTime,
+						actionEndTime);
 				}
 
 				available = false;
