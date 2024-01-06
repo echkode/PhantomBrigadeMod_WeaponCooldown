@@ -42,16 +42,16 @@ namespace EchKode.PBMods.WeaponCooldown
 				return false;
 			}
 
-			var dependentData = actionData.dataDependency;
-			var hasDependentAction = dependentData != null && !string.IsNullOrEmpty(dependentData.key);
 			var (partOK, part) = TryGetEquipmentPart(unit, actionData);
-			if (!partOK && !hasDependentAction)
+			var useEquipmentDuration = dataCore.durationType == DurationType.Equipment
+				&& actionData.dataEquipment != null
+				&& actionData.dataEquipment.partUsed;
+			if (!partOK && useEquipmentDuration)
 			{
-				// !!! Assumes that this function is called for equipment use actions.
 				if (LoggingToggles.AIBehaviorInvoke)
 				{
 					Debug.LogFormat(
-						"Mod {0} ({1}) IsAvailableAtTime(): part is not OK | time: {2:F3}s | unit: {3} | action: {4}",
+						"Mod {0} ({1}) IsAvailableAtTime(): action uses equipment but part is not OK | time: {2:F3}s | unit: {3} | action: {4}",
 						ModLink.modIndex,
 						ModLink.modID,
 						startTime,
@@ -60,7 +60,10 @@ namespace EchKode.PBMods.WeaponCooldown
 				}
 				return false;
 			}
-			else if (hasDependentAction)
+
+			var dependentData = actionData.dataDependency;
+			var hasDependentAction = dependentData != null && !string.IsNullOrEmpty(dependentData.key);
+			if (!partOK && hasDependentAction)
 			{
 				var dependentActionData = DataMultiLinkerAction.GetEntry(dependentData.key, false);
 				if (dependentActionData == null)
@@ -91,11 +94,7 @@ namespace EchKode.PBMods.WeaponCooldown
 				}
 			}
 
-			var useEquipmentDuration = partOK
-				&& dataCore.durationType == DurationType.Equipment
-				&& actionData.dataEquipment != null
-				&& actionData.dataEquipment.partUsed;
-			var duration = useEquipmentDuration
+			var duration = partOK && useEquipmentDuration
 				? PBDataHelperStats.GetCachedStatForPart(UnitStats.activationDuration, part)
 				: dataCore.duration;
 			var endTime = startTime + duration;
