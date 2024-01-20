@@ -163,15 +163,49 @@ namespace EchKode.PBMods.WeaponCooldown
 
 		public static void HidePaintedOverlap()
 		{
+			if (PBCIViewCombatTimeline.ins == null)
+			{
+				Debug.LogWarningFormat(
+					"Mod {0} ({1}) HidePaintedOverlap -- CIViewCombatTimeline ins is null",
+					ModLink.modIndex,
+					ModLink.modID);
+				return;
+			}
+
 			var t = new Traverse(PBCIViewCombatTimeline.ins);
 			var paintedHelper = t.Field<CIHelperTimelineAction>("helperActionPainted").Value;
+			if (paintedHelper == null)
+			{
+				Debug.LogWarningFormat(
+					"Mod {0} ({1}) HidePaintedOverlap -- helperActionPainted is null",
+					ModLink.modIndex,
+					ModLink.modID);
+				return;
+			}
 
 			if (paintedHelper.gameObject.activeSelf)
 			{
-				paintedHelper.spriteBackgroundOverlap.gameObject.SetActive(false);
+				if (paintedHelper.spriteBackgroundOverlap == null)
+				{
+					Debug.LogWarningFormat(
+						"Mod {0} ({1}) HidePaintedOverlap -- helperActionPainted.spriteBackgroundOverlap is null",
+						ModLink.modIndex,
+						ModLink.modID);
+				}
+				else
+				{
+					paintedHelper.spriteBackgroundOverlap.gameObject.SetActive(false);
+				}
 			}
 
-			if (PBCIViewCombatTimeline.ins.hideableWarningOverlap.gameObject.activeSelf)
+			if (PBCIViewCombatTimeline.ins.hideableWarningOverlap == null)
+			{
+				Debug.LogWarningFormat(
+					"Mod {0} ({1}) HidePaintedOverlap -- hideableWarningOverlap is null",
+					ModLink.modIndex,
+					ModLink.modID);
+			}
+			else if (PBCIViewCombatTimeline.ins.hideableWarningOverlap.gameObject.activeSelf)
 			{
 				t.Field<bool>("warningTimeoutLock").Value = false;
 			}
