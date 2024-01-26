@@ -6,59 +6,47 @@ using System.Reflection.Emit;
 
 using HarmonyLib;
 
-using PBCombatExecutionEndLateSystem = PhantomBrigade.Combat.Systems.CombatExecutionEndLateSystem;
+using PhantomBrigade.Combat.Systems;
+using PhantomBrigade.Data;
 
 namespace EchKode.PBMods.WeaponCooldown
 {
 	static partial class Patch
 	{
-		[HarmonyPatch(typeof(PBCombatExecutionEndLateSystem), "Execute", new System.Type[] { typeof(List<CombatEntity>) })]
+		[HarmonyPatch(typeof(CombatExecutionEndLateSystem), nameof(CombatExecutionEndLateSystem.SplitWaitActions))]
 		[HarmonyTranspiler]
 		static IEnumerable<CodeInstruction> Ceels_ExecuteTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
 		{
-			// Set up call to split long wait actions that cross into new turn on turn start boundary.
+			// Don't split locked actions like crashes.
 
 			var cm = new CodeMatcher(instructions, generator);
-			var getStartTimeMethodInfo = AccessTools.DeclaredPropertyGetter(typeof(ActionEntity), nameof(ActionEntity.startTime));
-			var setDisposedMethodInfo = AccessTools.DeclaredPropertySetter(typeof(ActionEntity), nameof(ActionEntity.isDisposed));
-			var getStartTimeMatch = new CodeMatch(OpCodes.Callvirt, getStartTimeMethodInfo);
-			var setDisposedMatch = new CodeMatch(OpCodes.Callvirt, setDisposedMethodInfo);
-			var convertMatch = new CodeMatch(OpCodes.Conv_R4);
-			var addMatch = new CodeMatch(OpCodes.Add);
-			var loadTurnStart = new CodeInstruction(OpCodes.Ldloc_2);
-			var splitCall = CodeInstruction.Call(typeof(CombatExecutionEndLateSystem), nameof(CombatExecutionEndLateSystem.SplitWaitAction));
+			var paintingTypeFieldInfo = AccessTools.DeclaredField(typeof(DataBlockActionCore), nameof(DataBlockActionCore.paintingType));
+			var paintingTypeMatch = new CodeMatch(OpCodes.Ldfld, paintingTypeFieldInfo);
+			var loadArgMatch = new CodeMatch(OpCodes.Ldarg_1);
+			var loadLocking = CodeInstruction.LoadField(typeof(DataBlockActionCore), nameof(DataBlockActionCore.locking));
+			var ret = new CodeInstruction(OpCodes.Ret);
 
-			cm.MatchStartForward(getStartTimeMatch)
+			cm.MatchStartForward(paintingTypeMatch)
 				.Advance(-1);
-			var actionEntityLocal = cm.Operand;
-			var loadActionEntity = new CodeInstruction(OpCodes.Ldloc_S, actionEntityLocal);
+			var loadDataCore = cm.Instruction.Clone();
 
-			cm.MatchStartForward(addMatch)
-				.Advance(1);
-			var actionEndTimeLocal = cm.Operand;
-			var loadActionEndTime = new CodeInstruction(OpCodes.Ldloc_S, actionEndTimeLocal);
-
-			cm.MatchEndForward(setDisposedMatch)
-				.MatchEndForward(addMatch)
-				.Advance(2);
-			var oldJumpTarget = new List<Label>(cm.Labels);
-
+			cm.MatchStartForward(loadArgMatch);
+			var labels = new List<Label>(cm.Labels);
 			cm.Labels.Clear();
-			cm.CreateLabel(out var newJumpTarget);
+			cm.CreateLabel(out var skipRetLabel);
+			var skipRet = new CodeInstruction(OpCodes.Brfalse_S, skipRetLabel);
 
-			var branchIncrement = new CodeInstruction(OpCodes.Br_S, newJumpTarget);
-			cm.InsertAndAdvance(branchIncrement)
-				.Insert(loadActionEntity)
-				.AddLabels(oldJumpTarget)
+			cm.Insert(loadDataCore)
+				.AddLabels(labels)
 				.Advance(1)
-				.InsertAndAdvance(loadActionEndTime)
-				.InsertAndAdvance(loadTurnStart)
-				.InsertAndAdvance(splitCall);
+				.InsertAndAdvance(loadLocking)
+				.InsertAndAdvance(skipRet)
+				.InsertAndAdvance(ret);
 
 			return cm.InstructionEnumeration();
 		}
 
-		[HarmonyPatch(typeof(PBCombatExecutionEndLateSystem), "Execute", new System.Type[] { typeof(List<CombatEntity>) })]
+		[HarmonyPatch(typeof(CombatExecutionEndLateSystem), "Execute", new System.Type[] { typeof(List<CombatEntity>) })]
 		[HarmonyTranspiler]
 		static IEnumerable<CodeInstruction> Ceels_ExecuteTranspiler2(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
 		{

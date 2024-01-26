@@ -77,7 +77,6 @@
     <Compile Include="CIViewCombatTimeline\RefreshTimelineRegions.cs" />
     <Compile Include="CombatAIBehaviorInvokeSystem.cs" />
     <Compile Include="CombatAIBindingSystem.cs" />
-    <Compile Include="CombatExecutionEndLateSystem.cs" />
     <Compile Include="CombatUIUtility.cs" />
     <Compile Include="ConsoleCommands\DiagnosticCommands.cs" />
     <Compile Include="ConsoleCommands\LoggingCommands.cs" />
@@ -97,9 +96,7 @@
     <Compile Include="Patches\CIViewCombatTimeline.cs" />
     <Compile Include="Patches\CombatExecutionEndLateSystem.cs" />
     <Compile Include="Patches\CombatUILinkInWorldScrubbing.cs" />
-    <Compile Include="Patches\CombatUILinkTimeline.cs" />
     <Compile Include="Patches\CombatUIUtility.cs" />
-    <Compile Include="Patches\CombatUtilities.cs" />
     <Compile Include="Patches\DataHelperAction.cs" />
     <Compile Include="Patches\EquipmentUtility.cs" />
     <Compile Include="Patches\InputCombatDashUtility.cs" />

@@ -106,6 +106,8 @@ namespace EchKode.PBMods.WeaponCooldown
 		[HarmonyTranspiler]
 		static IEnumerable<CodeInstruction> Cuiu_AttemptToFinishTimePlacementTranspiler2(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
 		{
+			// Hide overlap when action is successfully placed.
+
 			var cm = new CodeMatcher(instructions, generator);
 			var onRangeEndMethodInfo = AccessTools.DeclaredMethod(
 				typeof(WorldUICombat),

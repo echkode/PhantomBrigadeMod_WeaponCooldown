@@ -24,7 +24,14 @@ namespace EchKode.PBMods.WeaponCooldown
 
 			var cm = new CodeMatcher(instructions, generator);
 			var okLocal = generator.DeclareLocal(typeof(bool));
-			var getLastActionEndTimeMethodInfo = AccessTools.DeclaredMethod(typeof(PBActionUtility), nameof(PBActionUtility.GetLastActionTime));
+			var getLastActionEndTimeMethodInfo = AccessTools.DeclaredMethod(
+				typeof(PBActionUtility),
+				nameof(PBActionUtility.GetLastActionTime),
+				new System.Type[]
+				{
+					typeof(CombatEntity),
+					typeof(bool),
+				});
 			var getDurationMethodInfo = AccessTools.DeclaredMethod(typeof(PBCombatUIUtility), nameof(PBCombatUIUtility.GetPaintedTimePlacementDuration));
 			var getLastActionEndTimeMatch = new CodeMatch(OpCodes.Call, getLastActionEndTimeMethodInfo);
 			var getDurationMatch = new CodeMatch(OpCodes.Call, getDurationMethodInfo);

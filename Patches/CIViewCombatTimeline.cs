@@ -230,20 +230,26 @@ namespace EchKode.PBMods.WeaponCooldown
 			var cm = new CodeMatcher(instructions, generator);
 			var isLockedMethodInfo = AccessTools.DeclaredPropertyGetter(typeof(ActionEntity), nameof(ActionEntity.isLocked));
 			var onActionDragMethodInfo = AccessTools.DeclaredMethod(typeof(PBCIViewCombatTimeline), "OnActionDrag");
+			var tooltipUsedFieldInfo = AccessTools.DeclaredField(typeof(CIButton), nameof(CIButton.tooltipUsed));
 			var isLockedMatch = new CodeMatch(OpCodes.Callvirt, isLockedMethodInfo);
 			var onActionDragMatch = new CodeMatch(OpCodes.Ldftn, onActionDragMethodInfo);
-			var ret = new CodeInstruction(OpCodes.Ret);
+			var tooltipUsedMatch = new CodeMatch(OpCodes.Stfld, tooltipUsedFieldInfo);
 
-			cm.MatchStartForward(isLockedMatch)
+			cm.End()
+				.MatchStartBackwards(tooltipUsedMatch)
+				.Advance(-2);
+			cm.CreateLabel(out var skipDragLabel);
+			var skipDrag = new CodeInstruction(OpCodes.Brtrue_S, skipDragLabel);
+
+			cm.Start()
+				.MatchStartForward(isLockedMatch)
 				.Advance(-1);
 			var isLocked = cm.Instructions(2);
+
 			cm.MatchStartForward(onActionDragMatch)
-				.Advance(-3);
-			cm.CreateLabel(out var skipRetLabel);
-			var skipRet = new CodeInstruction(OpCodes.Brfalse_S, skipRetLabel);
+				.Advance(-2);
 			cm.InsertAndAdvance(isLocked)
-				.InsertAndAdvance(skipRet)
-				.InsertAndAdvance(ret);
+				.InsertAndAdvance(skipDrag);
 
 			return cm.InstructionEnumeration();
 		}
@@ -303,6 +309,8 @@ namespace EchKode.PBMods.WeaponCooldown
 		[HarmonyTranspiler]
 		static IEnumerable<CodeInstruction> Civct_OnActionSelectedTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
 		{
+			// Remove cancel when an action that isn't cancelled is selected.
+
 			var cm = new CodeMatcher(instructions, generator);
 			var retMatch = new CodeMatch(OpCodes.Ret);
 			var loadTimeline = CodeInstruction.LoadField(typeof(PBCIViewCombatTimeline), nameof(PBCIViewCombatTimeline.ins));

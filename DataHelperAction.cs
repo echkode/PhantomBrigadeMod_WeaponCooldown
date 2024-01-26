@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using PhantomBrigade;
 using PhantomBrigade.Data;
+using PhantomBrigade.Functions;
 using PBDataHelperAction = PhantomBrigade.Data.DataHelperAction;
 using PBDataHelperStats = PhantomBrigade.Data.DataHelperStats;
 
@@ -61,11 +62,10 @@ namespace EchKode.PBMods.WeaponCooldown
 				return false;
 			}
 
-			var dependentData = actionData.dataDependency;
-			var hasDependentAction = dependentData != null && !string.IsNullOrEmpty(dependentData.key);
+			var (hasDependentAction, dependentActionKey) = TryGetActionDependency(dataCore);
 			if (!partOK && hasDependentAction)
 			{
-				var dependentActionData = DataMultiLinkerAction.GetEntry(dependentData.key, false);
+				var dependentActionData = DataMultiLinkerAction.GetEntry(dependentActionKey, false);
 				if (dependentActionData == null)
 				{
 					Debug.LogWarningFormat(
@@ -74,7 +74,7 @@ namespace EchKode.PBMods.WeaponCooldown
 						ModLink.modID,
 						startTime,
 						actionData.key,
-						dependentData.key);
+						dependentActionKey);
 					return false;
 				}
 				if (!PBDataHelperAction.IsAvailable(dependentActionData, unit))
@@ -164,6 +164,25 @@ namespace EchKode.PBMods.WeaponCooldown
 
 			orderedActions.Clear();
 			return available;
+		}
+
+		public static (bool, string) TryGetActionDependency(DataBlockActionCore dataCore)
+		{
+			if (dataCore.functionsOnCreation == null || dataCore.functionsOnCreation.Count == 0)
+			{
+				return (false, "");
+			}
+
+			foreach (var func in dataCore.functionsOnCreation)
+			{
+				if (func is CombatActionCreateReaction react)
+				{
+					var key = react.dependencyActionKey;
+					return (!string.IsNullOrWhiteSpace(key), key);
+				}
+			}
+
+			return (false, "");
 		}
 
 		public static (bool, EquipmentEntity) TryGetEquipmentPart(

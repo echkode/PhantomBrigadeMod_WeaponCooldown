@@ -22,11 +22,18 @@ namespace EchKode.PBMods.WeaponCooldown
 			// If action start time is past max placement time, show late placement warning toast.
 
 			var cm = new CodeMatcher(instructions, generator);
-			var getLastActionTimeMethodInfo = AccessTools.DeclaredMethod(typeof(PBActionUtility), nameof(PBActionUtility.GetLastActionTime));
+			var getLastActionEndTimeMethodInfo = AccessTools.DeclaredMethod(
+				typeof(PBActionUtility),
+				nameof(PBActionUtility.GetLastActionTime),
+				new System.Type[]
+				{
+					typeof(CombatEntity),
+					typeof(bool),
+				});
 			var getCurrentTurnMethodInfo = AccessTools.DeclaredPropertyGetter(typeof(CombatContext), nameof(CombatContext.currentTurn));
 			var getTurnLengthMethodInfo = AccessTools.DeclaredPropertyGetter(typeof(CombatContext), nameof(CombatContext.turnLength));
 			var getSimMethodInfo = AccessTools.DeclaredPropertyGetter(typeof(DataShortcuts), nameof(DataShortcuts.sim));
-			var getLastActionTimeMatch = new CodeMatch(OpCodes.Call, getLastActionTimeMethodInfo);
+			var getLastActionEndTimeMatch = new CodeMatch(OpCodes.Call, getLastActionEndTimeMethodInfo);
 			var loadThis = new CodeInstruction(OpCodes.Ldarg_0);
 			var loadCombatContext = CodeInstruction.LoadField(typeof(InputUILinkWaitPainting), "combat");
 			var getCurrentTurn = new CodeInstruction(OpCodes.Callvirt, getCurrentTurnMethodInfo);
@@ -40,7 +47,7 @@ namespace EchKode.PBMods.WeaponCooldown
 			var add = new CodeInstruction(OpCodes.Add);
 			var showToast = CodeInstruction.Call(typeof(UILinkPaintingPatch), nameof(UILinkPaintingPatch.ShowWarningLate));
 
-			cm.MatchEndForward(getLastActionTimeMatch)
+			cm.MatchEndForward(getLastActionEndTimeMatch)
 				.Advance(3);
 			var loadActionStartTime = cm.Instruction.Clone();
 
